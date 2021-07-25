@@ -5,7 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 tox = "*"
-sphinx = "*
+sphinx = "*"
 pytest = "*"
 pytest-cov = "*"
 setuptools = "*"
