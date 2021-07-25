@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+tox = "*"
+sphinx = "*
+pytest = "*"
+pytest-cov = "*"
+setuptools = "*"
+
+[packages]
+disk-health-predictor = {path = "."}
+
+[requires]
+python_version = "3.8"
