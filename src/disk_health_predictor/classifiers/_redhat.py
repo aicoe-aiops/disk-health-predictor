@@ -9,13 +9,6 @@ import numpy as np
 from .._types import DevSmartT
 from ._base import DiskHealthClassifier
 
-
-def get_diskfailurepredictor_path() -> str:
-    path = os.path.abspath(__file__)
-    dir_path = os.path.dirname(path)
-    return dir_path
-
-
 # # DUMMY DEFINITION FOR TESTING PURPOSES
 # class RHDiskHealthClassifier:
 #     def __init__(self) -> None:

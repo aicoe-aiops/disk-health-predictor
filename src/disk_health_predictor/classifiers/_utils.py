@@ -1,7 +1,14 @@
+import os
 from typing import Dict
 
 from ._prophetstor import PSDiskHealthClassifier
 from ._redhat import RHDiskHealthClassifier
+
+
+def get_diskfailurepredictor_path() -> str:
+    path = os.path.abspath(__file__)
+    dir_path = os.path.dirname(path)
+    return dir_path
 
 
 def get_optimal_classifier_name(config: Dict):
