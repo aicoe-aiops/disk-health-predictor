@@ -1,0 +1,12 @@
+# See the OWNERS docs at https://go.k8s.io/owners
+
+approvers:
+  - chauhankaranraj
+  - MichaelClifford
+  - 4n4nd
+  - sesheta
+reviewers:
+  - chauhankaranraj
+  - MichaelClifford
+  - 4n4nd
+  - isabelizimm
