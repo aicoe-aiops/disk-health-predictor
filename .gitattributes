@@ -1,1 +1,2 @@
 models/**/*.pkl filter=lfs diff=lfs merge=lfs -text
+src/disk_health_predictor/pretrained_models/**/*.pkl filter=lfs diff=lfs merge=lfs -text
