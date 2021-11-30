@@ -5,10 +5,10 @@ from ._prophetstor import PSDiskHealthClassifier
 from ._redhat import RHDiskHealthClassifier
 
 
-def get_diskfailurepredictor_path() -> str:
+def get_modelstore_path() -> str:
     path = os.path.abspath(__file__)
-    dir_path = os.path.dirname(path)
-    return dir_path
+    modelstore_path = os.path.join(os.path.dirname(path), "../pretrained_models")
+    return modelstore_path
 
 
 def get_optimal_classifier_name(config: Dict):
@@ -17,8 +17,11 @@ def get_optimal_classifier_name(config: Dict):
 
 def DiskHealthClassifierFactory(predictor_name: str):
     if predictor_name == "redhat":
-        return RHDiskHealthClassifier
+        predictor = RHDiskHealthClassifier()
+        predictor.initialize(os.path.join(get_modelstore_path(), "redhat"))
     elif predictor_name == "prophetstor":
-        return PSDiskHealthClassifier
+        predictor = PSDiskHealthClassifier()
+        predictor.initialize(os.path.join(get_modelstore_path(), "prophetstor"))
     else:
         raise ValueError(f"No pretrained model found with the name {predictor_name}")
+    return predictor
