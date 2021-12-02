@@ -5,6 +5,7 @@ import pickle
 from typing import Dict, List, Optional, Sequence
 
 import numpy as np
+from numpy.lib.recfunctions import structured_to_unstructured
 
 from .._types import DevSmartT
 from ._base import DiskHealthClassifier
@@ -119,12 +120,15 @@ class RHDiskHealthClassifier(DiskHealthClassifier):
             )
             return None
 
-        # view structured array as 2d array for applying rolling window transforms
         # do not include capacity_bytes in this. only use smart_attrs
-        disk_days_attrs = (
-            disk_days_sa[[attr for attr in model_smart_attr if "smart_" in attr]]
-            .view(np.float64)
-            .reshape(disk_days_sa.shape + (-1,))
+        disk_days_smartctl_attrs_sa = disk_days_sa[
+            [attr for attr in model_smart_attr if "smart_" in attr]
+        ]
+
+        # view structured array as 2d array for applying rolling window transforms
+        # NOTE: this is new behavior from numpy 1.15 to 1.16
+        disk_days_smartctl_attrs = structured_to_unstructured(
+            disk_days_smartctl_attrs_sa
         )
 
         # featurize n (6 to 12) days data - mean,std,coefficient of variation
@@ -134,23 +138,32 @@ class RHDiskHealthClassifier(DiskHealthClassifier):
         # rolling time window interval size in days
         roll_window_size = 6
 
-        # rolling means generator
-        dataset_size = disk_days_attrs.shape[0] - roll_window_size + 1
-        gen = (
-            disk_days_attrs[i : i + roll_window_size, ...].mean(axis=0)
-            for i in range(dataset_size)
-        )
-        means = np.vstack(gen)
+        # number of days of data available
+        dataset_size = disk_days_smartctl_attrs.shape[0] - roll_window_size + 1
 
-        # rolling stds generator
-        gen = (
-            disk_days_attrs[i : i + roll_window_size, ...].std(axis=0, ddof=1)
-            for i in range(dataset_size)
+        # rolling means
+        means = np.vstack(
+            [
+                disk_days_smartctl_attrs[i : i + roll_window_size, ...].mean(axis=0)
+                for i in range(dataset_size)
+            ]
         )
-        stds = np.vstack(gen)
+
+        # rolling stds
+        stds = np.vstack(
+            [
+                disk_days_smartctl_attrs[i : i + roll_window_size, ...].std(
+                    axis=0, ddof=1
+                )
+                for i in range(dataset_size)
+            ]
+        )
 
         # coefficient of variation
-        cvs = stds / means
+        # there might be cases where mean for a smart attribute is 0
+        # this is not necessarily something to warn about
+        with np.errstate(divide="ignore", invalid="ignore"):
+            cvs = stds / means
         cvs[np.isnan(cvs)] = 0
         featurized = np.hstack(
             (
