@@ -18,14 +18,14 @@ presubmits:
             limits:
               memory: "500Mi"
               cpu: "300m"
-  - name: thoth-pytest-py38
+  - name: thoth-pytest
     decorate: true
     skip_report: false
     always_run: true
     context: aicoe-ci/prow/pytest
     spec:
       containers:
-        - image: quay.io/thoth-station/thoth-pytest-ubi8-py38:v0.13.0
+        - image: quay.io/thoth-station/thoth-pytest:v0.13.0
           command:
              - "/bin/run-pytest"
           resources:
